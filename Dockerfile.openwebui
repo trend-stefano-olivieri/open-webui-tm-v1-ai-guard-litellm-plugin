@@ -1,0 +1,7 @@
+ARG OPEN_WEBUI_IMAGE=ghcr.io/open-webui/open-webui:v0.11.0
+FROM ${OPEN_WEBUI_IMAGE}
+
+COPY patches/apply_openwebui_builtin_tools_gate.py /tmp/apply_openwebui_builtin_tools_gate.py
+RUN python /tmp/apply_openwebui_builtin_tools_gate.py \
+      /app/backend/open_webui/utils/middleware.py \
+    && rm /tmp/apply_openwebui_builtin_tools_gate.py

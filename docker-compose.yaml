@@ -1,0 +1,74 @@
+services:
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    container_name: secure-openwebui-ollama
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      OLLAMA_CONTEXT_LENGTH: "2048"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  ollama-model-loader:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/ollama"]
+    command: ["pull", "${OLLAMA_MODEL:-llama3.2}"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
+  litellm:
+    image: ${LITELLM_IMAGE:-docker.litellm.ai/berriai/litellm:main-stable}
+    container_name: secure-openwebui-litellm
+    command: ["--config", "/app/config.yaml", "--detailed_debug"]
+    volumes:
+      - ./litellm/config.yaml:/app/config.yaml:ro
+      - ./vendor/tm-v1-ai-guard-litellm-plugin/trendai_guard.py:/app/trendai_guard.py:ro
+    environment:
+      TMV1_API_KEY: ${TMV1_API_KEY:?TMV1_API_KEY is required}
+      TRENDAI_AI_GUARD_BASE_URL: ${TRENDAI_AI_GUARD_BASE_URL:?TRENDAI_AI_GUARD_BASE_URL is required}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is required}
+    depends_on:
+      ollama-model-loader:
+        condition: service_completed_successfully
+    ports:
+      - "${LITELLM_PORT:-4000}:4000"
+    restart: unless-stopped
+
+  open-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.openwebui
+      args:
+        OPEN_WEBUI_IMAGE: ${OPEN_WEBUI_IMAGE:-ghcr.io/open-webui/open-webui:v0.11.0}
+    image: secure-openwebui-trendai:local
+    container_name: secure-openwebui
+    volumes:
+      - open-webui-data:/app/backend/data
+    environment:
+      ENABLE_PLUGINS: "false"
+      ENABLE_FOLLOW_UP_GENERATION: "false"
+      ENABLE_OLLAMA_API: "false"
+      ENABLE_OPENAI_API: "true"
+      OPENAI_API_BASE_URL: http://litellm:4000/v1
+      OPENAI_API_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is required}
+      OLLAMA_BASE_URL: http://127.0.0.1:1
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:?WEBUI_SECRET_KEY is required}
+    depends_on:
+      - litellm
+    ports:
+      - "${OPEN_WEBUI_PORT:-3000}:8080"
+    restart: unless-stopped
+
+volumes:
+  ollama-data: {}
+  open-webui-data: {}

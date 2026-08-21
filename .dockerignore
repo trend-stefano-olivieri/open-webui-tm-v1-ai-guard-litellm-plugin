@@ -1,0 +1,4 @@
+*
+!Dockerfile.openwebui
+!patches/
+!patches/**
