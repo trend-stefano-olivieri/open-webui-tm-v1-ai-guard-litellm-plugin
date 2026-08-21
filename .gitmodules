@@ -1,0 +1,3 @@
+[submodule "vendor/tm-v1-ai-guard-litellm-plugin"]
+	path = vendor/tm-v1-ai-guard-litellm-plugin
+	url = https://github.com/trendmicro/tm-v1-ai-guard-litellm-plugin.git

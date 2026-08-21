@@ -1,0 +1,20 @@
+model_list:
+  - model_name: llama3.2
+    litellm_params:
+      model: ollama/llama3.2
+      api_base: http://ollama:11434
+
+guardrails:
+  - guardrail_name: trendai-guard
+    litellm_params:
+      guardrail: trendai_guard.TrendAIGuardrail
+      mode: [pre_call, post_call]
+      api_base: os.environ/TRENDAI_AI_GUARD_BASE_URL
+      api_key: os.environ/TMV1_API_KEY
+      app_name: openwebui
+      default_on: true
+      fallback_on_error: block
+      timeout: 5.0
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
