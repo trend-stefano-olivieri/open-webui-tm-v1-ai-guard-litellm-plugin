@@ -1,0 +1,26 @@
+version: 1
+
+# Annotation-only policy. It never blocks or rewrites the model's answer.
+thresholds:
+  grounded: 0.80
+  partial: 0.50
+
+# A sentence is counted as supported when the local NLI model's entailment
+# probability reaches this value for at least one retrieved-source chunk.
+evaluation:
+  claim_support: 0.70
+
+limits:
+  max_source_characters: 4000
+  max_query_characters: 1000
+  max_answer_characters: 2500
+  source_chunk_characters: 1200
+  source_chunk_overlap: 100
+  max_source_chunks: 8
+  max_claims: 12
+  inference_batch_size: 8
+
+annotations:
+  no_sources: true
+  evaluation_error: true
+  show_disclaimer: true

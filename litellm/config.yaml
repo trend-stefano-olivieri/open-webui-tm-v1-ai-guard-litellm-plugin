@@ -27,5 +27,14 @@ guardrails:
       fallback_on_error: block
       timeout: 5.0
 
+  - guardrail_name: grounding-annotation
+    litellm_params:
+      guardrail: grounding_guardrail.GroundingAnnotationGuardrail
+      mode: post_call
+      api_base: os.environ/GROUNDING_GUARD_API_BASE
+      policy_path: os.environ/GROUNDING_POLICY_PATH
+      default_on: true
+      timeout: 30.0
+
 general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY

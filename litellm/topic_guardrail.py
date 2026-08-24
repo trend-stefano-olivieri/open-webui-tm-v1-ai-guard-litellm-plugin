@@ -4,6 +4,7 @@ from typing import Any, Literal, Optional
 import httpx
 from fastapi import HTTPException
 
+from grounding.context import extract_latest_user_query
 from litellm._logging import verbose_proxy_logger
 from litellm.integrations.custom_guardrail import (
     CustomGuardrail,
@@ -61,25 +62,16 @@ class DeniedTopicsGuardrail(CustomGuardrail):
     ) -> Optional[str]:
         messages = inputs.get("structured_messages")
         if isinstance(messages, list):
-            for raw_message in reversed(messages):
-                message = self._message_as_dict(raw_message)
-                if not message or message.get("role") != "user":
-                    continue
-                content = message.get("content")
-                if isinstance(content, str):
-                    return content.strip() or None
-                if isinstance(content, list):
-                    parts = []
-                    for item in content:
-                        item_data = self._message_as_dict(item)
-                        if not item_data:
-                            continue
-                        if item_data.get("type") in ("text", "input_text"):
-                            text = item_data.get("text")
-                            if isinstance(text, str):
-                                parts.append(text)
-                    return "".join(parts).strip() or None
-                return None
+            normalized_messages = [
+                message
+                for message in (
+                    self._message_as_dict(raw_message) for raw_message in messages
+                )
+                if message is not None
+            ]
+            prompt = extract_latest_user_query(normalized_messages)
+            if prompt:
+                return prompt
 
         texts = inputs.get("texts")
         if isinstance(texts, list):

@@ -40,6 +40,14 @@ The derived image applies a minimal compatibility patch. OpenWebUI branding is n
 
 The model weights are downloaded when the local `topic-guard` image is built and remain subject to the model publisher's terms.
 
+## MiniLM NLI grounding classifier
+
+- Source: https://huggingface.co/cross-encoder/nli-MiniLM2-L6-H768
+- Pinned revision: `b95119ce93d3e065de6214e38cd4a97b0f2f2c6d`
+- License: Apache License 2.0
+
+The model weights are downloaded when the local `topic-guard` image is built and remain subject to the model publisher's terms.
+
 ## Topic-guard runtime dependencies
 
 - [PyTorch](https://github.com/pytorch/pytorch) — BSD-style license

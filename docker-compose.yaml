@@ -33,14 +33,19 @@ services:
       args:
         TOPIC_MODEL_ID: ${TOPIC_MODEL_ID:-MoritzLaurer/ModernBERT-base-zeroshot-v2.0}
         TOPIC_MODEL_REVISION: ${TOPIC_MODEL_REVISION:-d421c4545a438fd006fb43f8b981c5d908faa1e1}
+        GROUNDING_MODEL_ID: ${GROUNDING_MODEL_ID:-cross-encoder/nli-MiniLM2-L6-H768}
+        GROUNDING_MODEL_REVISION: ${GROUNDING_MODEL_REVISION:-b95119ce93d3e065de6214e38cd4a97b0f2f2c6d}
     image: secure-openwebui-topic-guard:local
     container_name: secure-openwebui-topic-guard
     environment:
       TOPIC_MODEL_PATH: /models/topic-model
       TOPIC_POLICY_PATH: /app/policies/topics.yaml
       TOPIC_POLICY_PROFILE: ${TOPIC_POLICY_PROFILE:-openwebui}
+      GROUNDING_MODEL_PATH: /models/grounding-model
+      GROUNDING_POLICY_PATH: /app/policies/grounding.yaml
     volumes:
       - ./policies/topics.yaml:/app/policies/topics.yaml:ro
+      - ./policies/grounding.yaml:/app/policies/grounding.yaml:ro
     healthcheck:
       test:
         - CMD
@@ -60,6 +65,9 @@ services:
     volumes:
       - ./litellm/config.yaml:/app/config.yaml:ro
       - ./litellm/topic_guardrail.py:/app/topic_guardrail.py:ro
+      - ./litellm/grounding_guardrail.py:/app/grounding_guardrail.py:ro
+      - ./grounding:/app/grounding:ro
+      - ./policies/grounding.yaml:/app/policies/grounding.yaml:ro
       - ./vendor/tm-v1-ai-guard-litellm-plugin/trendai_guard.py:/app/trendai_guard.py:ro
     environment:
       TMV1_API_KEY: ${TMV1_API_KEY:?TMV1_API_KEY is required}
@@ -67,6 +75,8 @@ services:
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is required}
       TOPIC_GUARD_API_BASE: http://topic-guard:8080
       TOPIC_POLICY_PROFILE: ${TOPIC_POLICY_PROFILE:-openwebui}
+      GROUNDING_GUARD_API_BASE: http://topic-guard:8080
+      GROUNDING_POLICY_PATH: /app/policies/grounding.yaml
     depends_on:
       ollama-model-loader:
         condition: service_completed_successfully
@@ -91,6 +101,7 @@ services:
       ENABLE_FOLLOW_UP_GENERATION: "false"
       ENABLE_OLLAMA_API: "false"
       ENABLE_OPENAI_API: "true"
+      RAG_SYSTEM_CONTEXT: "true"
       OPENAI_API_BASE_URL: http://litellm:4000/v1
       OPENAI_API_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is required}
       OLLAMA_BASE_URL: http://127.0.0.1:1

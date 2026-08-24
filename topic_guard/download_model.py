@@ -7,7 +7,9 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Download a pinned topic classifier")
+    parser = argparse.ArgumentParser(
+        description="Download a pinned local sequence classifier"
+    )
     parser.add_argument("--model", required=True)
     parser.add_argument("--revision", required=True)
     parser.add_argument("--output", required=True)
