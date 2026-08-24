@@ -8,9 +8,15 @@ If a credential is exposed, revoke or rotate it before removing it from Git hist
 
 ## Prompt data and logging
 
-Prompts and model responses are sent to the configured TrendAI Guard API for inspection. Confirm organizational requirements for data residency, retention, and access before production use.
+The denied-topic sidecar processes the latest user message locally and does not log raw prompt content. Prompts and model responses are also sent to the configured TrendAI Guard API for inspection. Confirm organizational requirements for data residency, retention, and access before production use.
+
+Both guardrails are configured to fail closed. If the local classifier, mounted topic policy, or TrendAI service is unavailable, LiteLLM rejects the request instead of sending unchecked content to the model.
 
 LiteLLM's `--detailed_debug` mode is enabled for initial validation and can log prompt or response content. Remove it from `docker-compose.yaml` after troubleshooting.
+
+## Policy changes
+
+Treat `policies/topics.yaml` as security-sensitive configuration. Require review, test topic changes against representative allowed and denied prompts, and retain the policy in version control. Topic classification is probabilistic and can produce false positives or false negatives.
 
 ## Reporting vulnerabilities
 

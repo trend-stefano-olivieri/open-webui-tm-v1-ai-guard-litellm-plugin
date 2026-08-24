@@ -26,20 +26,52 @@ services:
         condition: service_healthy
     restart: "no"
 
+  topic-guard:
+    build:
+      context: .
+      dockerfile: topic_guard/Dockerfile
+      args:
+        TOPIC_MODEL_ID: ${TOPIC_MODEL_ID:-MoritzLaurer/ModernBERT-base-zeroshot-v2.0}
+        TOPIC_MODEL_REVISION: ${TOPIC_MODEL_REVISION:-d421c4545a438fd006fb43f8b981c5d908faa1e1}
+    image: secure-openwebui-topic-guard:local
+    container_name: secure-openwebui-topic-guard
+    environment:
+      TOPIC_MODEL_PATH: /models/topic-model
+      TOPIC_POLICY_PATH: /app/policies/topics.yaml
+      TOPIC_POLICY_PROFILE: ${TOPIC_POLICY_PROFILE:-openwebui}
+    volumes:
+      - ./policies/topics.yaml:/app/policies/topics.yaml:ro
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
   litellm:
     image: ${LITELLM_IMAGE:-docker.litellm.ai/berriai/litellm:main-stable}
     container_name: secure-openwebui-litellm
     command: ["--config", "/app/config.yaml", "--detailed_debug"]
     volumes:
       - ./litellm/config.yaml:/app/config.yaml:ro
+      - ./litellm/topic_guardrail.py:/app/topic_guardrail.py:ro
       - ./vendor/tm-v1-ai-guard-litellm-plugin/trendai_guard.py:/app/trendai_guard.py:ro
     environment:
       TMV1_API_KEY: ${TMV1_API_KEY:?TMV1_API_KEY is required}
       TRENDAI_AI_GUARD_BASE_URL: ${TRENDAI_AI_GUARD_BASE_URL:?TRENDAI_AI_GUARD_BASE_URL is required}
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is required}
+      TOPIC_GUARD_API_BASE: http://topic-guard:8080
+      TOPIC_POLICY_PROFILE: ${TOPIC_POLICY_PROFILE:-openwebui}
     depends_on:
       ollama-model-loader:
         condition: service_completed_successfully
+      topic-guard:
+        condition: service_healthy
     ports:
       - "${LITELLM_PORT:-4000}:4000"
     restart: unless-stopped
@@ -64,7 +96,8 @@ services:
       OLLAMA_BASE_URL: http://127.0.0.1:1
       WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:?WEBUI_SECRET_KEY is required}
     depends_on:
-      - litellm
+      litellm:
+        condition: service_started
     ports:
       - "${OPEN_WEBUI_PORT:-3000}:8080"
     restart: unless-stopped

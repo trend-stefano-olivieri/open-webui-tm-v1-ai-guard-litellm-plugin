@@ -2,3 +2,7 @@
 !Dockerfile.openwebui
 !patches/
 !patches/**
+!topic_guard/
+!topic_guard/**
+!policies/
+!policies/**

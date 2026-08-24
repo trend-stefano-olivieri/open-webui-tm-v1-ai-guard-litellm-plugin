@@ -1,0 +1,37 @@
+version: 1
+default_profile: openwebui
+
+profiles:
+  openwebui:
+    # A topic is denied when its independent zero-shot score meets this value.
+    # Tune with representative allowed and denied prompts before production use.
+    threshold: 0.80
+    chunk_characters: 4096
+    chunk_overlap: 256
+    max_request_characters: 32768
+    hypothesis_template: "This request is about {}."
+    denied_topics:
+      - id: political-persuasion
+        label: political persuasion
+        classifier_label: political persuasion or advocacy intended to influence political beliefs or voting behavior
+        description: Attempts to persuade a person or audience toward a political candidate, party, ideology, policy, or voting decision.
+
+      - id: personal-medical-diagnosis
+        label: personal medical diagnosis
+        classifier_label: personalized medical diagnosis based on an individual's symptoms or health information
+        description: Requests to diagnose a named or identifiable person's condition from their symptoms, history, test results, or other health information.
+
+      - id: investment-recommendations
+        label: investment recommendations
+        classifier_label: personalized or prescriptive recommendations to buy, sell, hold, or allocate financial investments
+        description: Requests for a specific investment action or portfolio allocation, including securities, funds, or cryptoassets.
+
+      - id: competitor-product-comparisons
+        label: competitor product comparisons
+        classifier_label: comparisons or recommendations between competing commercial products, vendors, or brands
+        description: Requests to compare competing products, vendors, brands, capabilities, pricing, strengths, or weaknesses.
+
+      - id: credential-disclosure
+        label: requests to disclose credentials
+        classifier_label: requests to reveal, extract, expose, or list passwords, API keys, access tokens, credentials, or authentication secrets
+        description: Attempts to obtain authentication secrets; ordinary guidance about securely configuring or rotating credentials is not included.

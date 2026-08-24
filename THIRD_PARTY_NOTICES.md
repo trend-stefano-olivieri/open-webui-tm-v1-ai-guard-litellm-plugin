@@ -32,4 +32,20 @@ The derived image applies a minimal compatibility patch. OpenWebUI branding is n
 - Image: `ollama/ollama:latest`
 - License information: https://github.com/ollama/ollama/blob/main/LICENSE
 
+## ModernBERT zero-shot classifier
+
+- Source: https://huggingface.co/MoritzLaurer/ModernBERT-base-zeroshot-v2.0
+- Pinned revision: `d421c4545a438fd006fb43f8b981c5d908faa1e1`
+- License: Apache License 2.0
+
+The model weights are downloaded when the local `topic-guard` image is built and remain subject to the model publisher's terms.
+
+## Topic-guard runtime dependencies
+
+- [PyTorch](https://github.com/pytorch/pytorch) — BSD-style license
+- [Hugging Face Transformers](https://github.com/huggingface/transformers) — Apache License 2.0
+- [FastAPI](https://github.com/fastapi/fastapi) — MIT License
+- [Uvicorn](https://github.com/encode/uvicorn) — BSD 3-Clause License
+- [PyYAML](https://github.com/yaml/pyyaml) — MIT License
+
 Container images and downloaded model weights are distributed separately by their respective publishers and remain subject to their own terms.
