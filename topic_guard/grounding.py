@@ -9,6 +9,16 @@ from grounding.policy import GroundingPolicy
 
 _SENTENCE_BOUNDARY_RE = re.compile(r"(?<=[.!?])\s+|\n+")
 _MARKDOWN_PREFIX_RE = re.compile(r"^\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+)")
+_SOURCE_ATTRIBUTION_PREFIX_RE = re.compile(
+    r"^\s*(?:"
+    r"(?:(?:according to|based on|per)\s+(?:the\s+)?"
+    r"(?:(?:provided|retrieved|available)\s+)?"
+    r"(?:source(?:s)?|context|document(?:s)?|information)\s*[,;:]?\s*)"
+    r"|(?:(?:the\s+)?(?:source(?:s)?|document(?:s)?)\s+"
+    r"(?:states?|indicates?|reports?|says?)\s+(?:that\s+)?)"
+    r")",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -90,6 +100,7 @@ def _split_claims(answer: str, max_claims: int) -> tuple[list[str], bool]:
     claims: list[str] = []
     for raw_segment in _SENTENCE_BOUNDARY_RE.split(answer):
         segment = _MARKDOWN_PREFIX_RE.sub("", raw_segment).strip()
+        segment = _SOURCE_ATTRIBUTION_PREFIX_RE.sub("", segment).strip()
         if len(segment) < 2 or not any(character.isalnum() for character in segment):
             continue
         claims.append(segment)

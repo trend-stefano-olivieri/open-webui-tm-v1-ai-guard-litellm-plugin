@@ -210,6 +210,21 @@ class GroundingClassifierTests(unittest.TestCase):
         self.assertEqual(result.supported_claims, 1)
         self.assertEqual(result.claim_scores, (0.91,))
 
+    def test_source_attribution_prefix_is_not_part_of_the_claim(self):
+        source = "The capital of France is Paris."
+        expected_claim = "the capital of France is Paris."
+        predictor = FakeEntailmentPredictor({expected_claim: 0.95})
+        classifier = GroundingClassifier("unused", predictor=predictor)
+
+        result = classifier.evaluate(
+            [source],
+            "According to the source, the capital of France is Paris.",
+            self.policy,
+        )
+
+        self.assertEqual(result.supported_claims, 1)
+        self.assertEqual(predictor.pairs[0][1], expected_claim)
+
     def test_answer_limits_are_reported_as_truncation(self):
         predictor = FakeEntailmentPredictor({})
         classifier = GroundingClassifier("unused", predictor=predictor)
