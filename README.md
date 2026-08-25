@@ -36,6 +36,7 @@ Direct Ollama access is disabled in OpenWebUI so users cannot select an unguarde
 ## Prerequisites
 
 - Docker Desktop or Docker Engine with Compose v2
+- At least 8 GB of memory allocated to Docker Desktop for `llama3.2` plus both local classifiers
 - A TrendAI Vision One account with AI Guard enabled
 - A LiteLLM integration token generated in **Vision One → Workflow and Automation → Third-Party Integrations → LiteLLM**
 - At least 16 GB of free Docker storage for the first pull and local-model build
@@ -264,6 +265,10 @@ docker compose exec -T open-webui sh -lc \
 ```
 
 If LiteLLM returns the model but OpenWebUI does not, check for a stale persisted LiteLLM key as described under **Key rotation**.
+
+### Ollama reports `llama-server process has terminated: signal: killed`
+
+The Docker VM does not have enough memory to load `llama3.2` alongside OpenWebUI, LiteLLM, and the local policy models. Allocate at least 8 GB under **Docker Desktop → Settings → Resources → Memory**, restart Docker Desktop, and retry. The tested macOS deployment used 8 GB with a 2,048-token Ollama context.
 
 ### Function JSON appears as the assistant response
 
