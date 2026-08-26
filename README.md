@@ -4,7 +4,7 @@ Run OpenWebUI behind a LiteLLM proxy protected by the TrendAI Vision One AI Guar
 
 This repository packages the integration glue. It uses the official OpenWebUI, LiteLLM, Ollama, and [TrendAI LiteLLM Guardrail](https://github.com/trendmicro/tm-v1-ai-guard-litellm-plugin) projects; it is not an official release of those projects.
 
-![TrendAI Guard blocking a prompt attack in OpenWebUI](docs/images/trendai-guard-blocked-prompt.png)
+![AI Guard Gateway architecture](docs/images/ai-guard-gateway-architecture.png)
 
 ## How it works
 
