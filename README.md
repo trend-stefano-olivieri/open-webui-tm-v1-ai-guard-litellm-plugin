@@ -183,11 +183,13 @@ https://api.eu.xdr.trendmicro.com/v3.0/aiSecurity
 
 Self-hosted AWS or Kubernetes deployments should use the Guard API endpoint supplied by that deployment.
 
-### OpenWebUI tool-schema compatibility patch
+### OpenWebUI compatibility patches
 
 Small local models can echo OpenWebUI built-in function schemas as ordinary text. The derived OpenWebUI image applies a narrow compatibility patch: when `ENABLE_PLUGINS=false`, built-in tools are not injected into plain chats.
 
-The patch is intentionally fail-fast. If the targeted OpenWebUI source changes, the image build stops instead of silently producing a broken configuration. Review and update [`patches/apply_openwebui_builtin_tools_gate.py`](patches/apply_openwebui_builtin_tools_gate.py) before changing `OPEN_WEBUI_IMAGE`.
+Expected TrendAI and denied-topic HTTP 400 responses are also converted into assistant messages. This displays the actual policy denial instead of OpenWebUI's generic error banner and explains that grounding was not evaluated because model generation never ran.
+
+Both patches are intentionally fail-fast. If the targeted OpenWebUI source changes, the image build stops instead of silently producing a broken configuration. Review [`patches/apply_openwebui_builtin_tools_gate.py`](patches/apply_openwebui_builtin_tools_gate.py) and [`patches/apply_openwebui_guardrail_denials.py`](patches/apply_openwebui_guardrail_denials.py) before changing `OPEN_WEBUI_IMAGE`.
 
 ### Key rotation
 
