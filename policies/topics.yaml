@@ -16,10 +16,20 @@ profiles:
         classifier_label: political persuasion or advocacy intended to influence political beliefs or voting behavior
         description: Attempts to persuade a person or audience toward a political candidate, party, ideology, policy, or voting decision.
 
+      - id: personalized-voting-recommendations
+        label: personalized voting recommendations
+        classifier_label: recommendation about which political candidate or party a person should vote for
+        description: Requests for a specific candidate, party, or political voting choice for the user.
+
       - id: personal-medical-diagnosis
         label: personal medical diagnosis
         classifier_label: personalized medical diagnosis based on an individual's symptoms or health information
         description: Requests to diagnose a named or identifiable person's condition from their symptoms, history, test results, or other health information.
+
+      - id: personal-medical-prescribing
+        label: personal medical prescribing
+        classifier_label: request for a prescription or specific medicine to treat an individual's symptoms
+        description: Requests for a prescription or a specific medication or dosage for an individual's symptoms or condition.
 
       - id: investment-recommendations
         label: investment recommendations
@@ -30,8 +40,3 @@ profiles:
         label: competitor product comparisons
         classifier_label: comparisons or recommendations between competing commercial products, vendors, or brands
         description: Requests to compare competing products, vendors, brands, capabilities, pricing, strengths, or weaknesses.
-
-      - id: credential-disclosure
-        label: requests to disclose credentials
-        classifier_label: requests to reveal, extract, expose, or list passwords, API keys, access tokens, credentials, or authentication secrets
-        description: Attempts to obtain authentication secrets; ordinary guidance about securely configuring or rotating credentials is not included.

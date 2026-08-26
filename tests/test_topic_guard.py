@@ -42,10 +42,11 @@ class PolicyTests(unittest.TestCase):
             [topic.label for topic in policy.profile.denied_topics],
             [
                 "political persuasion",
+                "personalized voting recommendations",
                 "personal medical diagnosis",
+                "personal medical prescribing",
                 "investment recommendations",
                 "competitor product comparisons",
-                "requests to disclose credentials",
             ],
         )
 

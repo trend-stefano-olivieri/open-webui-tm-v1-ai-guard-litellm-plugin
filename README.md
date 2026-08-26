@@ -121,10 +121,11 @@ The percentage is a source-support estimate, not a general truth or bias score. 
 [`policies/topics.yaml`](policies/topics.yaml) defines the local `openwebui` policy profile. Its initial denied topics are:
 
 - political persuasion
+- personalized voting recommendations
 - personal medical diagnosis
+- personal medical prescribing
 - investment recommendations
 - competitor product comparisons
-- requests to disclose credentials
 
 Each entry has a stable `id`, the user-facing `label`, a descriptive `classifier_label`, and documentation in `description`. The classifier independently scores each candidate topic and blocks a request when any score is at least `threshold` (initially `0.80`). Only the latest user message is classified; system instructions and retrieved RAG documents are excluded. Long messages are scanned in overlapping chunks so a denied topic cannot bypass the check by appearing after an initial cutoff. Messages above `max_request_characters` fail closed.
 
@@ -169,7 +170,7 @@ The grounding model ID and immutable revision are configured in [`.env.example`]
 
 ### LiteLLM and TrendAI
 
-[`litellm/config.yaml`](litellm/config.yaml) registers the local denied-topic guard in `pre_call` mode, the pinned TrendAI plugin in both `pre_call` and `post_call` modes, and the local grounding annotator in `post_call` mode. The TrendAI plugin reads its API key and endpoint from environment variables.
+[`litellm/config.yaml`](litellm/config.yaml) registers the local denied-topic guard in `pre_call` mode, the pinned TrendAI plugin in both `pre_call` and `post_call` modes, and the local grounding annotator in `post_call` mode. A small local compatibility wrapper maps a policy-denied stream to HTTP 400 so OpenWebUI renders the denial instead of an internal-server error. The TrendAI plugin reads its API key and endpoint from environment variables.
 
 PII detection and redaction remain native TrendAI Guard capabilities. Configure the PII entities and actions in the Vision One AI Guard policy UI; this repository does not add Presidio or maintain a second PII policy.
 

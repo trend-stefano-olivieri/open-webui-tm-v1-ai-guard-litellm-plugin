@@ -26,6 +26,10 @@ guardrails:
       default_on: true
       fallback_on_error: block
       timeout: 5.0
+      # Scan smaller response batches so guarded streaming remains visibly
+      # active instead of buffering most short answers until completion.
+      stream_batch_size: 256
+      stream_overlap_size: 64
 
   - guardrail_name: grounding-annotation
     litellm_params:
