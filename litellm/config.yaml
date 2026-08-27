@@ -5,6 +5,17 @@ model_list:
       api_base: http://ollama:11434
 
 guardrails:
+  - guardrail_name: denied-topics
+    litellm_params:
+      guardrail: topic_guardrail.DeniedTopicsGuardrail
+      mode: pre_call
+      api_base: os.environ/TOPIC_GUARD_API_BASE
+      policy_profile: os.environ/TOPIC_POLICY_PROFILE
+      default_on: true
+      fallback_on_error: block
+      timeout: 15.0
+      skip_system_message_in_guardrail: true
+
   - guardrail_name: trendai-guard
     litellm_params:
       guardrail: trendai_guard.TrendAIGuardrail
@@ -15,6 +26,19 @@ guardrails:
       default_on: true
       fallback_on_error: block
       timeout: 5.0
+      # Scan smaller response batches so guarded streaming remains visibly
+      # active instead of buffering most short answers until completion.
+      stream_batch_size: 256
+      stream_overlap_size: 64
+
+  - guardrail_name: grounding-annotation
+    litellm_params:
+      guardrail: grounding_guardrail.GroundingAnnotationGuardrail
+      mode: post_call
+      api_base: os.environ/GROUNDING_GUARD_API_BASE
+      policy_path: os.environ/GROUNDING_POLICY_PATH
+      default_on: true
+      timeout: 30.0
 
 general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
