@@ -4,23 +4,9 @@ Run OpenWebUI behind a LiteLLM proxy protected by TrendAI Vision One AI Guard, a
 
 This repository packages the integration glue. It uses the official OpenWebUI, LiteLLM, Ollama, and [TrendAI LiteLLM Guardrail](https://github.com/trendmicro/tm-v1-ai-guard-litellm-plugin) projects; it is not an official release of those projects.
 
+## How it works
 ![AI Guard Gateway architecture](docs/images/ai-guard-gateway-architecture.png)
 
-## How it works
-
-```mermaid
-flowchart LR
-    U[User] --> W[OpenWebUI]
-    W -->|OpenAI-compatible API| L[LiteLLM]
-    L -->|pre_call topic check| T[Local policy sidecar]
-    T -->|allow| G[TrendAI Vision One AI Guard]
-    G -->|pre_call allow| O[Ollama / llama3.2]
-    O -->|response| G
-    G -->|post_call allow| L
-    L -->|answer + trusted RAG sources| T
-    T -->|source-support score| L
-    L -->|answer + grounding footer| W
-```
 
 1. OpenWebUI sends chat requests only to LiteLLM's OpenAI-compatible `/v1` API.
 2. The local denied-topic guard checks the latest user message with a pinned zero-shot classifier.
