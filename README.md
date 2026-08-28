@@ -181,6 +181,12 @@ Both patches are intentionally fail-fast. If the targeted OpenWebUI source chang
 
 OpenWebUI persists connection settings in its data volume. After rotating `LITELLM_MASTER_KEY`, update the LiteLLM connection key under **Admin Settings → Connections**, or start with a fresh `open-webui-data` volume. A stale persisted key can cause LiteLLM to return `No connected db` and hide the model list.
 
+### LiteLLM Admin UI
+
+The stack includes a persistent PostgreSQL database because LiteLLM cannot complete an Admin UI login without `DATABASE_URL`. Open http://localhost:4000/ui and sign in with `UI_USERNAME` and `UI_PASSWORD` from your local `.env` file. These credentials are separate from `LITELLM_MASTER_KEY`.
+
+Generate independent proxy, UI, database, and OpenWebUI secrets. Use hexadecimal or URL-safe characters for `POSTGRES_PASSWORD` because Compose inserts it into the PostgreSQL connection URL. The `litellm-postgres-data` volume preserves LiteLLM UI state across container recreation.
+
 ## Operations
 
 ```bash
@@ -191,10 +197,10 @@ docker compose down
 docker compose up -d --build
 
 # Follow runtime logs
-docker compose logs -f topic-guard litellm open-webui
+docker compose logs -f postgres topic-guard litellm open-webui
 ```
 
-Do not use `docker compose down -v` unless you intend to delete downloaded Ollama models and OpenWebUI application data.
+Do not use `docker compose down -v` unless you intend to delete downloaded Ollama models, LiteLLM database state, and OpenWebUI application data.
 
 ## Production guidance
 

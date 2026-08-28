@@ -1,4 +1,22 @@
 services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
+    container_name: secure-openwebui-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-litellm}
+      POSTGRES_USER: ${POSTGRES_USER:-litellm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - litellm-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-litellm} -d ${POSTGRES_DB:-litellm}
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
   ollama:
     image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
     container_name: secure-openwebui-ollama
@@ -74,11 +92,16 @@ services:
       TMV1_API_KEY: ${TMV1_API_KEY:?TMV1_API_KEY is required}
       TRENDAI_AI_GUARD_BASE_URL: ${TRENDAI_AI_GUARD_BASE_URL:?TRENDAI_AI_GUARD_BASE_URL is required}
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is required}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-litellm}
+      UI_USERNAME: ${UI_USERNAME:-admin}
+      UI_PASSWORD: ${UI_PASSWORD:?UI_PASSWORD is required}
       TOPIC_GUARD_API_BASE: http://topic-guard:8080
       TOPIC_POLICY_PROFILE: ${TOPIC_POLICY_PROFILE:-openwebui}
       GROUNDING_GUARD_API_BASE: http://topic-guard:8080
       GROUNDING_POLICY_PATH: /app/policies/grounding.yaml
     depends_on:
+      postgres:
+        condition: service_healthy
       ollama-model-loader:
         condition: service_completed_successfully
       topic-guard:
@@ -115,5 +138,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  litellm-postgres-data: {}
   ollama-data: {}
   open-webui-data: {}
